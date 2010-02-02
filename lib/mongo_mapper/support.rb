@@ -169,6 +169,13 @@ class SymbolOperator
   end unless method_defined?(:initialize)
   
   def to_mm_criteria(value)
+    case value
+      when Time
+        value = value.utc
+      else
+        value = value
+    end
+
     {MongoMapper::FinderOptions.normalized_field(@field) => {"$#{@operator}" => value}}
   end
   

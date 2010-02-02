@@ -43,6 +43,17 @@ class FinderOptionsTest < Test::Unit::TestCase
           :age => {"$#{operator}" => 21}
         }
       end
+      should "convert #{operator} times to utc if they aren't already" do
+        time = Time.now.in_time_zone('Indiana (East)')
+        criteria = FinderOptions.new(Room, :created_at.send(operator) => time).criteria
+        criteria[:created_at]["$#{operator}"].utc?.should be_true
+      end
+      should "not funk with #{operator} times already in utc" do
+        time = Time.now.utc
+        criteria = FinderOptions.new(Room, :created_at.send(operator) => time).criteria
+        criteria[:created_at]["$#{operator}"].utc?.should be_true
+        criteria[:created_at]["$#{operator}"].should == time
+      end
     end
     
     should "work with simple criteria" do
